@@ -1,0 +1,74 @@
+import { MOCK_COMPLAINTS, MY_OFFICER_ID } from '@/features/complaint/mock/complaints.mock';
+
+export default function ComplaintOverviewPage() {
+  const myComplaints = MOCK_COMPLAINTS.filter(c => c.assignedTo?.id === MY_OFFICER_ID);
+  const open = MOCK_COMPLAINTS.filter(c => c.status === 'OPEN').length;
+  const inProgress = myComplaints.filter(c => c.status === 'IN_PROGRESS').length;
+  const resolved = myComplaints.filter(c => c.status === 'RESOLVED').length;
+
+  return (
+    <div className="text-[#e8f4f0]">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {[
+          ['Total Complaints', MOCK_COMPLAINTS.length, 'in your woreda'],
+          ['Assigned to Me', myComplaints.length, 'my responsibility'],
+          ['In Progress', inProgress, 'currently handling'],
+          ['Resolved', resolved, 'completed by me'],
+        ].map(([label, value, sub]) => (
+          <div key={label} className="bg-[#05141f] border border-[rgba(29,158,117,0.08)] rounded-xl p-5">
+            <p className="text-[10px] uppercase tracking-widest text-[rgba(232,244,240,0.35)] mb-2">{label}</p>
+            <p className="font-syne text-3xl font-bold tracking-tight">{value}</p>
+            <p className="text-[10px] text-[#1D9E75] mt-1">{sub}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-[#05141f] border border-[rgba(29,158,117,0.08)] rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-syne font-bold text-sm tracking-tight">My Assigned Complaints</h3>
+            <a href="/complaint/complaints/assigned" className="text-[10px] text-[#1D9E75] hover:text-[#5DCAA5] transition-colors">View all</a>
+          </div>
+          <div className="space-y-3">
+            {myComplaints.slice(0, 4).map((c) => (
+              <div key={c.id} className="flex items-start justify-between py-2.5 border-b border-[rgba(29,158,117,0.04)] gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-[rgba(232,244,240,0.85)] truncate">{c.title}</p>
+                  <p className="text-[9px] text-[rgba(232,244,240,0.4)] mt-0.5">{c.submittedBy.fullName}</p>
+                </div>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] shrink-0 ${c.status === 'IN_PROGRESS' ? 'bg-[rgba(239,159,39,0.12)] text-[#EF9F27]' : c.status === 'RESOLVED' ? 'bg-[rgba(29,158,117,0.12)] text-[#1D9E75]' : 'bg-[rgba(226,75,74,0.12)] text-[#E24B4A]'}`}>
+                  {c.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-[#05141f] border border-[rgba(29,158,117,0.08)] rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-syne font-bold text-sm tracking-tight">Status Breakdown</h3>
+          </div>
+          <div className="space-y-4">
+            {[
+              ['Open', open, MOCK_COMPLAINTS.length, '#E24B4A'],
+              ['In Progress', MOCK_COMPLAINTS.filter(c => c.status === 'IN_PROGRESS').length, MOCK_COMPLAINTS.length, '#EF9F27'],
+              ['Resolved', MOCK_COMPLAINTS.filter(c => c.status === 'RESOLVED').length, MOCK_COMPLAINTS.length, '#1D9E75'],
+              ['Closed', MOCK_COMPLAINTS.filter(c => c.status === 'CLOSED').length, MOCK_COMPLAINTS.length, '#378ADD'],
+            ].map(([label, value, total, color]) => {
+              const pct = ((value / total) * 100).toFixed(1);
+              return (
+                <div key={label} className="flex items-center gap-3">
+                  <span className="text-[10px] text-[rgba(232,244,240,0.5)] w-20">{label}</span>
+                  <div className="flex-1 h-1.5 bg-[rgba(29,158,117,0.08)] rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+                  </div>
+                  <span className="text-[10px] text-[rgba(232,244,240,0.4)] w-12 text-right">{value} ({pct}%)</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
